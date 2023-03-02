@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+// where to write our package.
+option go_package = "github.com/ezratameno/blocker/proto";
+
+// message - define a type.
+
+message Block {
+  Header header = 1;
+
+  // repeated - slice
+  repeated Transaction transactions = 2;
+}
+
+message Header {
+  // version - the version of the serialization protocol.
+  // basically the structure of our block, importent for backward compatibility.
+  int32 version = 1;
+
+  // height - index of the block.
+  int32 height = 2;
+
+  // we have hashes and we will link them together.
+  bytes prevHash = 3;
+
+  //  Merkel root of the transaction.
+  bytes rootHash = 4;
+
+  //   Timestamp of when the block was created.
+  int64 timestamp = 5;
+}
+
+message Transaction {}
