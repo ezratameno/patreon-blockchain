@@ -30,4 +30,41 @@ message Header {
   int64 timestamp = 5;
 }
 
-message Transaction {}
+// A transaction where we recived coins, like from where do we have some change that we want to use
+// to send to someone.
+message TxInput {
+  // The previous hash of the transaction containing
+  // the output we want to spend.
+  bytes prevTxHash = 1;
+
+  // The index of the output of the previous transaction we
+  // want to spend.
+  uint32 prevOutIndex = 2;
+
+  // public key created base on the private key.
+  bytes PubicKey = 3;
+
+  // signature based on the private key.
+  bytes signature = 4;
+}
+
+message TxOutput {
+  // amount to send.
+  int64 amount = 1;
+
+  // where to send.
+  bytes address = 2;
+}
+
+// Transaction includes an input and an output.
+// One user send another some coins, the number sent and recevied must be the same.
+message Transaction {
+  // version used for compability, so people will know how to decode/encode the transaction.
+  int32 version = 1;
+
+  // from which transaction we have coins we want to send.
+  repeated TxInput inputs = 2;
+
+  // The destaintion of the coins we want to spend.
+  repeated TxOutput outputs = 3;
+}
