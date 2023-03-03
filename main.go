@@ -4,9 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net"
 	"os"
-	"time"
 
 	"github.com/ezratameno/pateon-bloackchain/node"
 	"github.com/ezratameno/pateon-bloackchain/proto"
@@ -21,32 +19,38 @@ func main() {
 }
 
 func run() error {
-	node := node.NewNode()
+	makeNode(":3001", []string{})
+	makeNode(":4001", []string{":3001"})
 
-	opts := []grpc.ServerOption{}
-	grpcServer := grpc.NewServer(opts...)
-	ln, err := net.Listen("tcp", ":3001")
-	if err != nil {
-		return err
-	}
+	// go func() {
+	// 	for {
+	// 		time.Sleep(2 * time.Second)
+	// 		makeTransaction()
+	// 	}
 
-	// register the node so we can serve it.
-	proto.RegisterNodeServer(grpcServer, node)
+	// }()
+	// err := node.Start(":3001")
+	// if err != nil {
+	// 	return err
+	// }
 
-	fmt.Println("node running on port:", ":3001")
-
-	go func() {
-		for {
-			time.Sleep(2 * time.Second)
-			makeTransaction()
-		}
-
-	}()
-	err = grpcServer.Serve(ln)
-	if err != nil {
-		return err
-	}
+	select {}
 	return nil
+}
+
+func makeNode(listenAddr string, bootstrapNodes []string) *node.Node {
+	n := node.NewNode()
+
+	go n.Start(listenAddr)
+
+	if len(bootstrapNodes) > 0 {
+		err := n.BootstrapNetwork(bootstrapNodes)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	return n
 }
 
 func makeTransaction() {
@@ -58,8 +62,9 @@ func makeTransaction() {
 	c := proto.NewNodeClient(client)
 
 	v := &proto.Version{
-		Version: "blocker-1.0.1",
-		Height:  28,
+		Version:    "blocker-1.0.1",
+		Height:     28,
+		ListenAddr: ":4001",
 	}
 	_, err = c.Handshake(context.TODO(), v)
 	if err != nil {
