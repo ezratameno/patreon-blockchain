@@ -11,9 +11,10 @@ service Node {
 
 // servers exchange version information to connect to other servers.
 message Version {
-  string version    = 1;
-  int32  height     = 2;
-  string listenAddr = 3;
+  string          version    = 1;
+  int32           height     = 2;
+  string          listenAddr = 3;
+  repeated string peerList   = 4;
 }
 
 message Ack {

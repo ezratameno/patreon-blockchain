@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/ezratameno/pateon-bloackchain/node"
 	"github.com/ezratameno/pateon-bloackchain/proto"
@@ -20,14 +21,16 @@ func main() {
 
 func run() error {
 	makeNode(":3001", []string{})
+	time.Sleep(2 * time.Second)
 	makeNode(":4001", []string{":3001"})
-
+	time.Sleep(2 * time.Second)
+	makeNode(":5001", []string{":4001"})
 	// go func() {
 	// 	for {
-	// 		time.Sleep(2 * time.Second)
+	// 		time.Sleep(4 * time.Second)
 	// 		makeTransaction()
 	// 	}
-
+	// }()
 	// }()
 	// err := node.Start(":3001")
 	// if err != nil {
@@ -41,14 +44,7 @@ func run() error {
 func makeNode(listenAddr string, bootstrapNodes []string) *node.Node {
 	n := node.NewNode()
 
-	go n.Start(listenAddr)
-
-	if len(bootstrapNodes) > 0 {
-		err := n.BootstrapNetwork(bootstrapNodes)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
+	go n.Start(listenAddr, bootstrapNodes)
 
 	return n
 }
